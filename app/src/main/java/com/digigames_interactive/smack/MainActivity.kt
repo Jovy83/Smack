@@ -1,5 +1,6 @@
 package com.digigames_interactive.smack
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
@@ -34,7 +35,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loginBtnNavClicked(view: View) {
-
+        val loginIntent = Intent(this, LoginActivity::class.java)
+        startActivity(loginIntent)
     }
 
     fun addChannelClicked(view: View) {
@@ -42,6 +44,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun sendMsgBtnClicked(view: View) {
-        
+
     }
 }
