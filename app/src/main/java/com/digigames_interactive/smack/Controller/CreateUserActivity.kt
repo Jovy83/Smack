@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import com.digigames_interactive.smack.R
+import com.digigames_interactive.smack.Services.AuthService
 import kotlinx.android.synthetic.main.activity_create_user.*
 import java.util.*
 
@@ -44,5 +45,10 @@ class CreateUserActivity : AppCompatActivity() {
     }
 
     fun createUserBtnClicked(view: View) {
+        AuthService.registerUser(this, "t@t.com", "123456") {
+            if (it) {
+
+            }
+        }
     }
 }
