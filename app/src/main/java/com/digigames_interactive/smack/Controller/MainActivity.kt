@@ -1,4 +1,4 @@
-package com.digigames_interactive.smack
+package com.digigames_interactive.smack.Controller
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.digigames_interactive.smack.R
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 
@@ -19,7 +20,9 @@ class MainActivity : AppCompatActivity() {
 
 
         val toggle = ActionBarDrawerToggle(
-            this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this, drawer_layout, toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
         )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
