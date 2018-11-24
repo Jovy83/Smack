@@ -1,8 +1,8 @@
 package com.digigames_interactive.smack.Controller
 
 import android.graphics.Color
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.digigames_interactive.smack.R
 import com.digigames_interactive.smack.Services.AuthService
@@ -24,7 +24,7 @@ class CreateUserActivity : AppCompatActivity() {
         val color = random.nextInt(2) // 0 and 1 only, 2 not included
         val avatar = random.nextInt(28)
 
-        userAvatar = if(color == 0) "light$avatar" else "dark$avatar"
+        userAvatar = if (color == 0) "light$avatar" else "dark$avatar"
         val resourceId = resources.getIdentifier(userAvatar, "drawable", packageName)
         createAvatarImageView.setImageResource(resourceId)
     }
@@ -45,9 +45,17 @@ class CreateUserActivity : AppCompatActivity() {
     }
 
     fun createUserBtnClicked(view: View) {
-        AuthService.registerUser(this, "t@t.com", "123456") {
-            if (it) {
+        val email = createEmailTextField.text.toString()
+        val password = createPasswordTextField.text.toString()
 
+        AuthService.registerUser(this, email, password) { registerSuccess ->
+            if (registerSuccess) {
+                AuthService.loginUser(this, email, password) {loginSuccess ->
+                    if (loginSuccess) {
+                        println(AuthService.authToken)
+                        println(AuthService.userEmail)
+                    }
+                }
             }
         }
     }
