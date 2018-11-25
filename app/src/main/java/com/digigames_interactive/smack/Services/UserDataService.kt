@@ -35,7 +35,7 @@ object UserDataService {
 
         val scanner = Scanner(strippedColor)
         // just to make sure that there is actually something to be scanned
-        if (scanner.hasNext()) {
+        if (scanner.hasNextDouble()) {
             r = (scanner.nextDouble() * 255).toInt()
             g = (scanner.nextDouble() * 255).toInt()
             b = (scanner.nextDouble() * 255).toInt()

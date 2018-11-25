@@ -28,7 +28,7 @@
             tools:text="Jovy Ong"
             app:layout_constraintTop_toTopOf="@+id/userImageNavHeader"
             app:layout_constraintStart_toEndOf="@+id/userImageNavHeader"
-            android:layout_marginStart="8dp" android:textColor="@android:color/white" android:text="Login"/>
+            android:layout_marginStart="8dp" android:textColor="@android:color/white"/>
 
     <TextView
             android:layout_width="wrap_content"
