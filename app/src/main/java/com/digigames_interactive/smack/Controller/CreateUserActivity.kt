@@ -1,12 +1,15 @@
 package com.digigames_interactive.smack.Controller
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.Toast
 import com.digigames_interactive.smack.R
 import com.digigames_interactive.smack.Services.AuthService
-import com.digigames_interactive.smack.Services.UserDataService
+import com.digigames_interactive.smack.Utilities.BROADCAST_USER_DATA_CHANGED
 import kotlinx.android.synthetic.main.activity_create_user.*
 import java.util.*
 
@@ -20,6 +23,8 @@ class CreateUserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_user)
+
+        createSpinner.visibility = View.INVISIBLE
     }
 
     fun generateUserAvatar(view: View) {
@@ -48,25 +53,56 @@ class CreateUserActivity : AppCompatActivity() {
     }
 
     fun createUserBtnClicked(view: View) {
+        enableSpinner(true)
         val userName = createUserNameTextField.text.toString()
         val email = createEmailTextField.text.toString()
         val password = createPasswordTextField.text.toString()
+
+        if (userName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Make sure all fields are filled in.", Toast.LENGTH_SHORT).show()
+            enableSpinner(false)
+            return
+        }
 
         AuthService.registerUser(this, email, password) { registerSuccess ->
             if (registerSuccess) {
                 AuthService.loginUser(this, email, password) { loginSuccess ->
                     if (loginSuccess) {
-                        AuthService.createUser(this, userName, email, userAvatar, avatarColor) {createSuccess ->
+                        AuthService.createUser(this, userName, email, userAvatar, avatarColor) { createSuccess ->
                             if (createSuccess) {
-                                println(UserDataService.avatarName)
-                                println(UserDataService.avatarColor)
-                                println(UserDataService.name)
+
+                                val userDataChanged = Intent(BROADCAST_USER_DATA_CHANGED)
+                                LocalBroadcastManager.getInstance(this).sendBroadcast(userDataChanged)
+
+                                enableSpinner(false)
                                 finish()
+                            } else {
+                                errorToast()
                             }
                         }
+                    } else {
+                        errorToast()
                     }
                 }
+            } else {
+                errorToast()
             }
         }
+    }
+
+    fun errorToast() {
+        Toast.makeText(this, "Something went wrong, please try again.", Toast.LENGTH_SHORT).show()
+        enableSpinner(false)
+    }
+
+    fun enableSpinner(enable: Boolean) {
+        if (enable) {
+            createSpinner.visibility = View.VISIBLE
+        } else {
+            createSpinner.visibility = View.INVISIBLE
+        }
+        createUserBtn.isEnabled = !enable
+        createAvatarImageView.isEnabled = !enable
+        backgroundColorBtn.isEnabled = !enable
     }
 }

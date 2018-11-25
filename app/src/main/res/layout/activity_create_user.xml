@@ -70,4 +70,12 @@
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginStart="32dp" android:layout_marginEnd="32dp" android:background="@color/colorPrimary"
             android:textColor="@android:color/white" android:onClick="createUserBtnClicked"/>
+    <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/createSpinner"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp" android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="@+id/createPasswordTextField"/>
 </android.support.constraint.ConstraintLayout>
