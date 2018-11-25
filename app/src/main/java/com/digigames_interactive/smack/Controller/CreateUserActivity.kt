@@ -6,10 +6,13 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.digigames_interactive.smack.R
 import com.digigames_interactive.smack.Services.AuthService
+import com.digigames_interactive.smack.Services.UserDataService
 import kotlinx.android.synthetic.main.activity_create_user.*
 import java.util.*
 
 class CreateUserActivity : AppCompatActivity() {
+
+
 
     var userAvatar = "profileDefault"
     var avatarColor = "[0.5, 0.5, 0.5, 1]"
@@ -45,15 +48,22 @@ class CreateUserActivity : AppCompatActivity() {
     }
 
     fun createUserBtnClicked(view: View) {
+        val userName = createUserNameTextField.text.toString()
         val email = createEmailTextField.text.toString()
         val password = createPasswordTextField.text.toString()
 
         AuthService.registerUser(this, email, password) { registerSuccess ->
             if (registerSuccess) {
-                AuthService.loginUser(this, email, password) {loginSuccess ->
+                AuthService.loginUser(this, email, password) { loginSuccess ->
                     if (loginSuccess) {
-                        println(AuthService.authToken)
-                        println(AuthService.userEmail)
+                        AuthService.createUser(this, userName, email, userAvatar, avatarColor) {createSuccess ->
+                            if (createSuccess) {
+                                println(UserDataService.avatarName)
+                                println(UserDataService.avatarColor)
+                                println(UserDataService.name)
+                                finish()
+                            }
+                        }
                     }
                 }
             }
