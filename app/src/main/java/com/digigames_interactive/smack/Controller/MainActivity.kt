@@ -19,10 +19,13 @@ import com.digigames_interactive.smack.Services.UserDataService
 import com.digigames_interactive.smack.Utilities.BROADCAST_USER_DATA_CHANGED
 import com.digigames_interactive.smack.Utilities.SOCKET_URL
 import io.socket.client.IO
+import io.socket.emitter.Emitter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.add_channel_dialog.view.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
+import com.digigames_interactive.smack.Model.Channel
+import com.digigames_interactive.smack.Services.MessageService
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,7 +49,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, toolbar,
             R.string.navigation_drawer_open,
@@ -54,26 +56,25 @@ class MainActivity : AppCompatActivity() {
         )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
+
+        socket.on("channelCreated", onNewChannel)
+        socket.connect()
     }
 
     override fun onResume() {
-        super.onResume()
         super.onResume()
         LocalBroadcastManager.getInstance(this).registerReceiver(
             userDataChangeReceiver, IntentFilter(
                 BROADCAST_USER_DATA_CHANGED
             )
         )
-        socket.connect()
     }
 
-    override fun onPause() {
-        super.onPause()
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChangeReceiver)
-    }
+
 
     override fun onDestroy() {
         super.onDestroy()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChangeReceiver)
         socket.disconnect()
     }
 
@@ -121,6 +122,24 @@ class MainActivity : AppCompatActivity() {
                 }
                 .show()
 
+        }
+    }
+
+    private val onNewChannel = Emitter.Listener {args ->
+        // the args here are what the server API passes to us/client
+
+        // the emitter.listener's callback is on a worker/background thread
+        // we'll need to get on the main thread to update our UI
+        runOnUiThread {
+            val channelName = args[0] as String
+            val channelDescription = args[1] as String
+            val channelId = args[2] as String
+
+            val newChannel = Channel(channelName, channelDescription, channelId)
+            MessageService.channels.add(newChannel)
+            println(newChannel.name)
+            println(newChannel.description)
+            println(newChannel.id)
         }
     }
 
