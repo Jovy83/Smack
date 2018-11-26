@@ -17,12 +17,16 @@ import com.digigames_interactive.smack.R
 import com.digigames_interactive.smack.Services.AuthService
 import com.digigames_interactive.smack.Services.UserDataService
 import com.digigames_interactive.smack.Utilities.BROADCAST_USER_DATA_CHANGED
+import com.digigames_interactive.smack.Utilities.SOCKET_URL
+import io.socket.client.IO
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.add_channel_dialog.view.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 
 class MainActivity : AppCompatActivity() {
+
+    val socket = IO.socket(SOCKET_URL)
 
     private val userDataChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -50,15 +54,27 @@ class MainActivity : AppCompatActivity() {
         )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
+    }
 
-        hideKeyboard()
-
+    override fun onResume() {
+        super.onResume()
+        super.onResume()
         LocalBroadcastManager.getInstance(this).registerReceiver(
             userDataChangeReceiver, IntentFilter(
                 BROADCAST_USER_DATA_CHANGED
             )
         )
+        socket.connect()
+    }
 
+    override fun onPause() {
+        super.onPause()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChangeReceiver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        socket.disconnect()
     }
 
     override fun onBackPressed() {
@@ -83,7 +99,6 @@ class MainActivity : AppCompatActivity() {
             val loginIntent = Intent(this, LoginActivity::class.java)
             startActivity(loginIntent)
         }
-
     }
 
     fun addChannelClicked(view: View) {
@@ -98,9 +113,8 @@ class MainActivity : AppCompatActivity() {
                     val channelName = nameTextField.text.toString()
                     val channelDesc = descTextField.text.toString()
 
-                    hideKeyboard()
                     // Create channel with the channel name and description
-
+                    socket.emit("newChannel", channelName, channelDesc)
                 }
                 .setNegativeButton("Cancel") { dialogInterface, i ->
                     // Cancel and close the dialog
@@ -111,7 +125,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun sendMsgBtnClicked(view: View) {
-
+        hideKeyboard()
     }
 
     fun hideKeyboard() {
