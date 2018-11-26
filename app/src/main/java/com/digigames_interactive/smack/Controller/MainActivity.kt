@@ -9,13 +9,16 @@ import android.os.Bundle
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import com.digigames_interactive.smack.R
 import com.digigames_interactive.smack.Services.AuthService
 import com.digigames_interactive.smack.Services.UserDataService
 import com.digigames_interactive.smack.Utilities.BROADCAST_USER_DATA_CHANGED
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.add_channel_dialog.view.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 
@@ -48,8 +51,13 @@ class MainActivity : AppCompatActivity() {
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(userDataChangeReceiver, IntentFilter(
-            BROADCAST_USER_DATA_CHANGED))
+        hideKeyboard()
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            userDataChangeReceiver, IntentFilter(
+                BROADCAST_USER_DATA_CHANGED
+            )
+        )
 
     }
 
@@ -79,10 +87,38 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun addChannelClicked(view: View) {
+        // don't let user open this dialog if they're not logged in
+        if (AuthService.isLoggedIn) {
+            val builder = AlertDialog.Builder(this)
+            val dialogView = layoutInflater.inflate(R.layout.add_channel_dialog, null)
+            builder.setView(dialogView)
+                .setPositiveButton("Add") { dialogInterface, i ->
+                    val nameTextField = dialogView.addChannelNameTextField
+                    val descTextField = dialogView.addChannelDescTextField
+                    val channelName = nameTextField.text.toString()
+                    val channelDesc = descTextField.text.toString()
 
+                    hideKeyboard()
+                    // Create channel with the channel name and description
+
+                }
+                .setNegativeButton("Cancel") { dialogInterface, i ->
+                    // Cancel and close the dialog
+                }
+                .show()
+
+        }
     }
 
     fun sendMsgBtnClicked(view: View) {
 
+    }
+
+    fun hideKeyboard() {
+        val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (inputManager.isAcceptingText) {
+            // windowToken will grab which ever input method is active, in this case, the keyboard
+            inputManager.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+        }
     }
 }
