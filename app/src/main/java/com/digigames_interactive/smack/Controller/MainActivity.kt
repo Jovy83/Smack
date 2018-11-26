@@ -13,8 +13,11 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
+import com.digigames_interactive.smack.Model.Channel
 import com.digigames_interactive.smack.R
 import com.digigames_interactive.smack.Services.AuthService
+import com.digigames_interactive.smack.Services.MessageService
 import com.digigames_interactive.smack.Services.UserDataService
 import com.digigames_interactive.smack.Utilities.BROADCAST_USER_DATA_CHANGED
 import com.digigames_interactive.smack.Utilities.SOCKET_URL
@@ -24,15 +27,19 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.add_channel_dialog.view.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
-import com.digigames_interactive.smack.Model.Channel
-import com.digigames_interactive.smack.Services.MessageService
 
 class MainActivity : AppCompatActivity() {
 
     val socket = IO.socket(SOCKET_URL)
+    lateinit var channelAdapter: ArrayAdapter<Channel>
+
+    private fun setupAdapters() {
+        channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, MessageService.channels)
+        channel_list.adapter = channelAdapter
+    }
 
     private val userDataChangeReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
+        override fun onReceive(context: Context, intent: Intent?) {
             if (AuthService.isLoggedIn) {
                 userNameNavHeader.text = UserDataService.name
                 userEmailNavHeader.text = UserDataService.email
@@ -40,6 +47,12 @@ class MainActivity : AppCompatActivity() {
                 userImageNavHeader.setImageResource(resourceId)
                 userImageNavHeader.setBackgroundColor(UserDataService.returnAvatarColor(UserDataService.avatarColor))
                 loginBtnNavHeader.text = "Logout"
+
+                MessageService.getChannels(context) { complete ->
+                    if (complete) {
+                        channelAdapter.notifyDataSetChanged()
+                    }
+                }
             }
         }
     }
@@ -59,6 +72,8 @@ class MainActivity : AppCompatActivity() {
 
         socket.on("channelCreated", onNewChannel)
         socket.connect()
+
+        setupAdapters()
     }
 
     override fun onResume() {
@@ -69,7 +84,6 @@ class MainActivity : AppCompatActivity() {
             )
         )
     }
-
 
 
     override fun onDestroy() {
@@ -125,7 +139,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val onNewChannel = Emitter.Listener {args ->
+    private val onNewChannel = Emitter.Listener { args ->
         // the args here are what the server API passes to us/client
 
         // the emitter.listener's callback is on a worker/background thread
@@ -137,9 +151,7 @@ class MainActivity : AppCompatActivity() {
 
             val newChannel = Channel(channelName, channelDescription, channelId)
             MessageService.channels.add(newChannel)
-            println(newChannel.name)
-            println(newChannel.description)
-            println(newChannel.id)
+            channelAdapter.notifyDataSetChanged()
         }
     }
 
