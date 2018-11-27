@@ -16,7 +16,6 @@ import java.util.*
 class CreateUserActivity : AppCompatActivity() {
 
 
-
     var userAvatar = "profileDefault"
     var avatarColor = "[0.5, 0.5, 0.5, 1]"
 
@@ -64,11 +63,11 @@ class CreateUserActivity : AppCompatActivity() {
             return
         }
 
-        AuthService.registerUser(this, email, password) { registerSuccess ->
+        AuthService.registerUser(email, password) { registerSuccess ->
             if (registerSuccess) {
-                AuthService.loginUser(this, email, password) { loginSuccess ->
+                AuthService.loginUser(email, password) { loginSuccess ->
                     if (loginSuccess) {
-                        AuthService.createUser(this, userName, email, userAvatar, avatarColor) { createSuccess ->
+                        AuthService.createUser(userName, email, userAvatar, avatarColor) { createSuccess ->
                             if (createSuccess) {
 
                                 val userDataChanged = Intent(BROADCAST_USER_DATA_CHANGED)

@@ -1,10 +1,8 @@
 package com.digigames_interactive.smack.Services
 
-import android.content.Context
 import android.util.Log
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.Volley
 import com.digigames_interactive.smack.Controller.App
 import com.digigames_interactive.smack.Model.Channel
 import com.digigames_interactive.smack.Utilities.URL_GET_CHANNELS
@@ -14,7 +12,7 @@ object MessageService {
 
     val channels = ArrayList<Channel>()
 
-    fun getChannels(context: Context, complete: (Boolean) -> Unit) {
+    fun getChannels(complete: (Boolean) -> Unit) {
 
         val channelsRequest =
             object : JsonArrayRequest(Method.GET, URL_GET_CHANNELS, null, Response.Listener { response ->
@@ -23,7 +21,7 @@ object MessageService {
                         val channel = response.getJSONObject(x)
                         val channelName = channel.getString("name")
                         val channelDescription = channel.getString("description")
-                        val channelId =  channel.getString("_id")
+                        val channelId = channel.getString("_id")
 
                         val newChannel = Channel(channelName, channelDescription, channelId)
                         channels.add(newChannel)
