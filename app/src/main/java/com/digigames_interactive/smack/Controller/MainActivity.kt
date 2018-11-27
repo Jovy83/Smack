@@ -15,6 +15,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import com.digigames_interactive.smack.Model.Channel
+import com.digigames_interactive.smack.Model.Message
 import com.digigames_interactive.smack.R
 import com.digigames_interactive.smack.Services.AuthService
 import com.digigames_interactive.smack.Services.MessageService
@@ -88,6 +89,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         socket.on("channelCreated", onNewChannel)
+        socket.on("messageCreated", onNewMessage)
         socket.connect()
 
         setupAdapters()
@@ -172,8 +174,42 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val onNewMessage = Emitter.Listener { args ->
+        runOnUiThread {
+            val msgBody = args[0] as String
+            val msgChannelId = args[2] as String
+            val userName = args[3] as String
+            val userAvatar = args[4] as String
+            val userAvatarColor = args[5] as String
+            val id = args[6] as String
+            val timeStamp = args[7] as String
+
+            val newMessage = Message(msgBody, userName, msgChannelId, userAvatar, userAvatarColor, id, timeStamp)
+            MessageService.messages.add(newMessage)
+            println(newMessage.content)
+        }
+    }
+
     fun sendMsgBtnClicked(view: View) {
-        hideKeyboard()
+        if (App.prefs.isLoggedIn && messageTextField.text.isNotEmpty() && selectedChannel != null) {
+
+            val userId = UserDataService.id
+            val channelId =
+                selectedChannel!!.id // ok to use !! here because we already null checked selectedChannel above
+            socket.emit(
+                "newMessage",
+                messageTextField.text.toString(),
+                userId,
+                channelId,
+                UserDataService.name,
+                UserDataService.avatarName,
+                UserDataService.avatarColor
+            )
+
+            // clear the textfield
+            messageTextField.text.clear()
+            hideKeyboard()
+        }
     }
 
     fun hideKeyboard() {

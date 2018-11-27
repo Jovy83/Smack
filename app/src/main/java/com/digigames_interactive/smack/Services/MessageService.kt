@@ -5,12 +5,14 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.digigames_interactive.smack.Controller.App
 import com.digigames_interactive.smack.Model.Channel
+import com.digigames_interactive.smack.Model.Message
 import com.digigames_interactive.smack.Utilities.URL_GET_CHANNELS
 import org.json.JSONException
 
 object MessageService {
 
     val channels = ArrayList<Channel>()
+    val messages = ArrayList<Message>()
 
     fun getChannels(complete: (Boolean) -> Unit) {
 
