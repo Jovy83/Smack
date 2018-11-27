@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     private val userDataChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
-            if (AuthService.isLoggedIn) {
+            if (App.prefs.isLoggedIn) {
                 userNameNavHeader.text = UserDataService.name
                 userEmailNavHeader.text = UserDataService.email
                 val resourceId = resources.getIdentifier(UserDataService.avatarName, "drawable", packageName)
@@ -70,21 +70,21 @@ class MainActivity : AppCompatActivity() {
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
-        socket.on("channelCreated", onNewChannel)
-        socket.connect()
-
-        setupAdapters()
-    }
-
-    override fun onResume() {
-        super.onResume()
         LocalBroadcastManager.getInstance(this).registerReceiver(
             userDataChangeReceiver, IntentFilter(
                 BROADCAST_USER_DATA_CHANGED
             )
         )
-    }
 
+        socket.on("channelCreated", onNewChannel)
+        socket.connect()
+
+        setupAdapters()
+
+        if (App.prefs.isLoggedIn) {
+            AuthService.findUserByEmail(this) {}
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loginBtnNavClicked(view: View) {
-        if (AuthService.isLoggedIn) {
+        if (App.prefs.isLoggedIn) {
             // logout
             UserDataService.logout()
             userNameNavHeader.text = ""
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
 
     fun addChannelClicked(view: View) {
         // don't let user open this dialog if they're not logged in
-        if (AuthService.isLoggedIn) {
+        if (App.prefs.isLoggedIn) {
             val builder = AlertDialog.Builder(this)
             val dialogView = layoutInflater.inflate(R.layout.add_channel_dialog, null)
             builder.setView(dialogView)

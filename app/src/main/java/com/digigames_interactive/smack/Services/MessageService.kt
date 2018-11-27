@@ -5,6 +5,7 @@ import android.util.Log
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
+import com.digigames_interactive.smack.Controller.App
 import com.digigames_interactive.smack.Model.Channel
 import com.digigames_interactive.smack.Utilities.URL_GET_CHANNELS
 import org.json.JSONException
@@ -42,10 +43,10 @@ object MessageService {
                 }
 
                 override fun getHeaders(): MutableMap<String, String> {
-                    return hashMapOf("Authorization" to "Bearer ${AuthService.authToken}")
+                    return hashMapOf("Authorization" to "Bearer ${App.prefs.authToken}")
                 }
             }
 
-        Volley.newRequestQueue(context).add(channelsRequest)
+        App.prefs.requestQueue.add(channelsRequest)
     }
 }
